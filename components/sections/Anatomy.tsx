@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import type { CarId } from "@/components/car/types";
 import { CARS } from "@/lib/site";
@@ -48,17 +48,17 @@ const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
 export function Anatomy() {
   const [car, setCar] = useState<CarId>("a");
   const stage = useRef<HTMLDivElement>(null);
-  const seen = useInView(stage, { once: true, margin: "-20% 0px" });
+  const reduce = useReducedMotion();
 
-  const explode = useMotionValue(0);
+  // Scroll-linked: the car comes apart as the stage rises into view, holds open (labels in)
+  // while it sits mid-screen, and closes again as it leaves. Scrolling back plays it in reverse.
+  const { scrollYProgress } = useScroll({ target: stage, offset: ["start end", "end start"] });
+  const opened = useTransform(scrollYProgress, [0.1, 0.36, 0.56, 0.8], [0, 1, 1, 0]);
+  const smooth = useSpring(opened, { stiffness: 120, damping: 26, mass: 0.6 });
+  const still = useMotionValue(1);
+  const explode = reduce ? still : smooth;
   const morph = useMotionValue(0);
   const labels = useTransform(explode, [0, 0.75, 1], [0, 0, 1]);
-
-  useEffect(() => {
-    if (!seen) return;
-    const c = animate(explode, 1, { duration: 1.8, ease: [0.65, 0, 0.35, 1], delay: 0.15 });
-    return () => c.stop();
-  }, [seen, explode]);
 
   useEffect(() => {
     const c = animate(morph, car === "a" ? 0 : 1, { duration: 1.1, ease: [0.65, 0, 0.35, 1] });
