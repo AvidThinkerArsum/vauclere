@@ -1,0 +1,59 @@
+"use client";
+
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Word-by-word rise. The wrapper is observed; each word starts clipped below its line. */
+export function Words({ text, italic, delay = 0, className }: { text?: string; italic?: string; delay?: number; className?: string }) {
+  const words = [
+    ...(text ? text.split(" ") : []).map((w) => ({ w, em: false })),
+    ...(italic ? italic.split(" ") : []).map((w) => ({ w, em: true })),
+  ];
+  return (
+    <motion.span className={className} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-8% 0px" }}>
+      <span className="sr-only">{`${text ?? ""} ${italic ?? ""}`.trim()}</span>
+      <span aria-hidden>
+        {words.map(({ w, em }, i) => (
+          <span key={i}>
+            <span className="-mb-[0.12em] inline-block overflow-hidden pb-[0.12em] align-bottom">
+              <motion.span
+                className="inline-block"
+                variants={{ hidden: { y: "105%" }, show: { y: 0 } }}
+                transition={{ duration: 0.8, delay: delay + i * 0.06, ease: EASE }}
+              >
+                {em ? <em>{w}</em> : w}
+              </motion.span>
+            </span>
+            {i < words.length - 1 ? " " : null}
+          </span>
+        ))}
+      </span>
+    </motion.span>
+  );
+}
+
+export function Rise({ children, delay = 0, className, y = 22 }: { children: ReactNode; delay?: number; className?: string; y?: number }) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ y, opacity: 0 }}
+      whileInView={{ y: 0, opacity: 1 }}
+      viewport={{ once: true, margin: "-8% 0px" }}
+      transition={{ duration: 0.8, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function Eyebrow({ n, children, className = "" }: { n: string; children: ReactNode; className?: string }) {
+  return (
+    <p className={`eyebrow flex items-center gap-4 ${className}`}>
+      <span>{n}</span>
+      <span className="h-px w-10 bg-current opacity-40" />
+      <span>{children}</span>
+    </p>
+  );
+}
