@@ -82,10 +82,9 @@ function HeroScroll() {
   });
   const wmB = useMotionTemplate`${wmBv}vw`;
 
-  // Counter 01 → 02 (mid-turn) and the progress on the bottom rule.
-  const c1 = useTransform(p, [TURN_MID - 0.04, TURN_MID + 0.04], ["0%", "-110%"]);
-  const c2 = useTransform(p, [TURN_MID - 0.04, TURN_MID + 0.04], ["110%", "0%"]);
+  // Scroll cue fades as soon as the car starts to open; the bottom rule fills with progress.
   const cue = useTransform(p, [0, 0.04, 1], [1, 0, 0]);
+  const cueY = useTransform(p, [0, 0.04, 1], [0, 8, 8]);
 
   const goTo = useCallback((t: number) => {
     const el = ref.current;
@@ -147,27 +146,28 @@ function HeroScroll() {
           </motion.div>
         </div>
 
-        {/* Bottom rule, arrows and counter */}
+        {/* Bottom: scroll cue, progress rule and arrows */}
         <motion.div style={{ color: ink }} className="absolute inset-x-0 bottom-0 z-30">
-          <div className="mx-auto flex max-w-[1600px] items-end gap-4 px-5 pb-6 sm:px-10 sm:pb-9 lg:px-[5.5vw]">
-            <div className="relative mb-[0.62rem] flex-1">
+          <div className="mx-auto flex max-w-[1600px] items-center gap-5 px-5 pb-6 sm:px-10 sm:pb-9 lg:px-[5.5vw]">
+            <div className="relative flex-1">
+              <motion.button
+                type="button"
+                onClick={() => goTo(TURN_MID)}
+                style={{ opacity: cue, y: cueY }}
+                className="absolute bottom-[calc(100%+16px)] left-0 flex items-center gap-3 rounded-full border border-current/20 bg-white/40 py-2 pl-2.5 pr-4 backdrop-blur-sm transition-colors hover:bg-white/70"
+                aria-label="Scroll to open the car"
+              >
+                <ScrollMark />
+                <span className="eyebrow whitespace-nowrap text-[0.6rem] opacity-90">
+                  Scroll<span className="hidden sm:inline"> to open the car</span>
+                </span>
+              </motion.button>
               <div className="hairline" />
               <motion.div style={{ scaleX: p }} className="absolute inset-x-0 top-0 h-px origin-left bg-current" />
-              <motion.p style={{ opacity: cue }} className="eyebrow absolute -top-8 left-0 opacity-70">
-                Scroll<span className="hidden sm:inline"> to open the car</span>
-              </motion.p>
             </div>
             <div className="flex items-center gap-1">
               <ArrowBtn dir="left" label={`Show ${A.name}`} onClick={() => goTo(0)} />
               <ArrowBtn dir="right" label={`Show ${B.name}`} onClick={() => goTo(1)} />
-            </div>
-            <div className="wordmark relative h-[1.1em] w-[2.6ch] overflow-hidden text-3xl tracking-[0.06em] sm:text-[2.6rem]" aria-hidden>
-              <motion.span style={{ y: c1 }} className="absolute inset-0">
-                01
-              </motion.span>
-              <motion.span style={{ y: c2 }} className="absolute inset-0">
-                02
-              </motion.span>
             </div>
           </div>
         </motion.div>
@@ -182,11 +182,23 @@ function Wordmark({ car }: { car: "a" | "b" }) {
     <div>
       <h2 className="wordmark text-[12.5vw] md:text-[8.2vw]">{c.wordmark}</h2>
       <p className="eyebrow mt-4 flex items-center gap-3 opacity-75 md:mt-6 md:pl-[0.4vw]">
-        <span>{car === "a" ? "01" : "02"}</span>
         <span className="h-px w-8 bg-current opacity-60" />
         <span>{c.line}</span>
       </p>
     </div>
+  );
+}
+
+/* A small mouse with its wheel dot sliding down, on a loop. */
+function ScrollMark() {
+  return (
+    <span aria-hidden className="relative grid h-7 w-[18px] place-items-start justify-center rounded-full border border-current/60">
+      <motion.span
+        className="mt-1.5 block h-1.5 w-[3px] rounded-full bg-current"
+        animate={{ y: [0, 9], opacity: [1, 0] }}
+        transition={{ duration: 1.5, ease: "easeOut", repeat: Infinity, repeatDelay: 0.2 }}
+      />
+    </span>
   );
 }
 
@@ -228,7 +240,6 @@ function HeroStill() {
             </div>
             <div className="absolute inset-x-0 bottom-0 z-10 mx-auto flex max-w-[1600px] items-end gap-4 px-5 pb-6 sm:px-10 lg:px-[5.5vw]">
               <div className="hairline mb-[0.62rem] flex-1" />
-              <span className="wordmark text-3xl tracking-[0.06em] sm:text-[2.6rem]">0{i + 1}</span>
             </div>
           </div>
         );
