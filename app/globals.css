@@ -1,26 +1,124 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cream: #ecebdf;
+  --color-paper: #f3f1e8;
+  --color-bone: #e6e2d6;
+  --color-moss: #2c3a2c;
+  --color-moss-2: #4c5a4a;
+  --color-sage: #a7b39c;
+  --color-rose: #ead7d0;
+  --color-oxblood: #5b1715;
+  --color-sumac: #c4452c;
+  --color-ink: #1d211c;
+  --color-ink-2: #565b52;
+  --color-muted: #8b8c82;
+
+  --font-wide: var(--font-michroma), "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-instrument), Georgia, serif;
+  --font-body: var(--font-manrope), system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* Wide, tracked caps: nav, labels, eyebrows */
+.wide {
+  font-family: var(--font-wide);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.eyebrow {
+  font-family: var(--font-wide);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.wordmark {
+  font-family: var(--font-wide);
+  letter-spacing: 0.16em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+}
+
+.display em {
+  font-style: italic;
+}
+
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.4 0 0 0 0.25 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+
+.hairline {
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+/* Form fields: a single rule underneath, nothing else */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  padding: 0.85rem 0 0.7rem;
+  font-size: 1rem;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 48px;
+  color: inherit;
+}
+
+.field:focus {
+  border-bottom-color: currentColor;
+}
+
+.field::placeholder {
+  color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
+select.field {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 12px) 55%, calc(100% - 7px) 55%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
